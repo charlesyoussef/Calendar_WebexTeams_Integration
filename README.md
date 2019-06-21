@@ -1,9 +1,10 @@
-# MEA Calendar Webex Teams Integration
+# WordPress-based Calendar with Cisco Webex-Teams Integration
 
-This is a Webex Teams integration for MEA calendar built using Node.js botkit and Python  
+This is a Webex Teams integration for WordPress-based calendar, built using Node.js botkit and Python.  
 
 Capabilities:
 - List next 6 upcoming events in MEA Calendar
+- Assist a user in a new event creation
 - Provide an easy way for admins to get notified when an event is submitted
 - Provide an easy way for admins to approve a submitted event via sending a message to the bot
 
@@ -12,28 +13,28 @@ Capabilities:
 1) You'll need to specify a PUBLIC_URL for your bot, and a Webex Teams API access token (either in the .env settings or via env variables).  
 
 To update the .env file:
-1. Set the PUBLIC_URL variable to the public HTTPS address where the bot is listening (has to be publicly reachable URL on port 3000).  For testing purposes, ngrok (https://ngrok.com) is used.
-- Set the ACCESS_TOKEN variable to the token of the Webex Teams bot to be used
+1. Set the PUBLIC_URL variable to the public HTTPS address where the bot is listening (has to be publicly reachable URL on port 3000).  For testing purposes, ngrok (https://ngrok.com) or Serveo (https://serveo.net) can be used.
+2. Set the ACCESS_TOKEN variable to the token of the Webex Teams bot to be used. More information on how to get the bot token can be found at https://developer.webex.com
 
-Alternatively, these variables can be passed via environment variables on the CLI:
+Alternatively, these variables can be passed via environment variables on the CLI.
 
 Note that the values on the command line or in your machine env variables will prevail over .env file settings.
 
-2) (One-time) Install NPM:  
+2) (One-time) Install NPM packages:
 npm install
 
-3) Run the node.js bot:
+3) (One-time) Install the Python packages, preferably in a new virtualenv:
+pip install -r requirements.txt
+
+4) Run the node.js bot:
 node bot.js
 
-To specify the variables in 1) as env variables:
+Note: To run the bot while specifying the variables of 1) as runtime variables:
 ACCESS_TOKEN=0123456789abcdef PUBLIC_URL=https://abcdef.ngrok.io node bot.js
 
-4) (One-time) Install the Python prerequisites, preferably in a virtual environment:
-$ pip install -r requirements.txt
-
 5) Run the Python monitor scripts, which include built-in schedulers, so no need for external cron schedulers:
-$ python event_list_upcoming.py
-$ python event_approvals_check.py
+$ python check_for_upcoming_events.py
+$ python check_for_event_approvals.py
 
 
 ## Authors & Maintainers
