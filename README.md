@@ -10,7 +10,13 @@ Capabilities:
 
 ## How to run
 
-1) You'll need to specify a PUBLIC_URL for your bot, and a Webex Teams API access token (either in the .env settings or via env variables).  
+0) (One-time) Clone the template files:
+- clone .env_template into a new file called .env
+- clone env_file-template.py into a new file called env_file.py
+
+1) Update the new files .env and env_file.py with the correct variables.
+
+In .env file, you'll need to specify a PUBLIC_URL for your bot, and a Webex Teams API access token (either in the .env settings or via env variables).  
 
 To update the .env file:
 1. Set the PUBLIC_URL variable to the public HTTPS address where the bot is listening (has to be publicly reachable URL on port 3000).  For testing purposes, ngrok (https://ngrok.com) or Serveo (https://serveo.net) can be used.
