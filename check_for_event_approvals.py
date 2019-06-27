@@ -51,20 +51,51 @@ def metabase_get_auth_token(host=METABASE_HOST, username=METABASE_USERNAME,
     headers = {
         "Content-Type": "application/json"
     }
-    try:
-        result = requests.post(url=metabase_auth_url, headers=headers, data=json.dumps(payload),
-            verify=False)
-        result.raise_for_status()
-    except:
-        print("Unable to authenticate to Metabase server. Please verify " \
-            "settings and reachability.")
-        sys.exit(1)
 
-    token = result.json()["id"]
-    return {
-        "metabase_host": host,
-        "token": token
+    # get the saved token from the token-file:
+    try:
+        with open('.metabase_token.txt', 'r', encoding='utf-8') as f:
+            saved_token = f.read()
+        #print("saved_token is: %s" % saved_token)
+    except FileNotFoundError:
+        # there is no existing token file.
+        # Authenticate using username&password & create a token file
+        with open('.metabase_token.txt', 'w+', encoding='utf-8') as f:
+            f.write("token_string_will_go_here")
+    # Run a test API call to verify if we can authenticate using this token:
+    yh_post_meta_url = 'http://%s/api/card/132/query/json' % host
+    test_api = requests.post(url=yh_post_meta_url, )
+    headers = {
+        "Content-Type": "application/json",
+        "X-Metabase-Session": saved_token
     }
+    test_query_result = requests.post(url=yh_post_meta_url, headers=headers, verify=False)
+    if test_query_result.status_code == 401:
+        #print("invalid saved token, authenticating with saved user/pass")
+        # token is invalid, authenticate using username/password
+        try:
+            result = requests.post(url=metabase_auth_url, headers=headers, data=json.dumps(payload),
+                verify=False)
+            result.raise_for_status()
+        except:
+            print("Unable to authenticate to Metabase server. Please verify " \
+                "settings and reachability.")
+            sys.exit(1)
+        token = result.json()["id"]
+        with open('.metabase_token.txt', 'w+', encoding='utf-8') as f:
+            f.write(token)
+        return {
+            "metabase_host": host,
+            "token": token
+        }
+    elif test_query_result.status_code == 200:
+        #print("auth using saved token is successful")
+        # saved_token is valid, just return it:
+        return {
+            "metabase_host": host,
+            "token": saved_token
+        }
+
 
 def get_new_events_requiring_approvals(host, token, date_now_string):
     """calls the metabase query on Yh Posts table, using Metabase question 132,
@@ -87,7 +118,7 @@ def get_new_events_requiring_approvals(host, token, date_now_string):
 
     # to be used to compare the events modified date to:
     now_date = dt.strptime(date_now_string, "%Y-%m-%dT%H:%M:%S")
-
+    print(now_date)
     result = []
 
     for event in query_result_dict:
@@ -95,10 +126,14 @@ def get_new_events_requiring_approvals(host, token, date_now_string):
         event_modified_date = dt.strptime(event_modified_date_string, "%Y-%m-%dT%H:%M:%S")
         # convert to same timezone as on running VM:
         event_modified_date = event_modified_date - datetime.timedelta(hours=8)
-        if event["post_status"] == "future":
+        if event["post_status"] in ["future", "pending"]:
+            print(event["post_title"])
+            print(event_modified_date)
+            print(now_date - event_modified_date)
             # We check if the timedelta is < 5 minutes:
             # Format: class datetime.timedelta([days[, seconds[, microseconds[, milliseconds[, minutes]]]]])
-            if now_date - event_modified_date <= datetime.timedelta(0, 0, 0, 0, 5):
+            #if now_date - event_modified_date <= datetime.timedelta(0, 0, 0, 0, 5):
+            if now_date - event_modified_date <= datetime.timedelta(0, 0, 0, 0, 60):
                 result.append(event)
 
     return result
@@ -187,7 +222,7 @@ def main():
     # The list of events submitted within the last 5 minutes, requiring approvals:
     new_events_requiring_approval_list = get_new_events_requiring_approvals(METABASE_HOST,
         token, date_now_string)
-
+    print(new_events_requiring_approval_list)
     if new_events_requiring_approval_list != []:
          # check for more attributes of the new event
         new_events_requiring_approval_list_plusmeta = get_event_meta_details(METABASE_HOST, token,
