@@ -1,4 +1,16 @@
-# WordPress-based Calendar with Cisco Webex-Teams Integration
+## Business Challenge
+Companies using a shared web calendar to track events can be facing challenges that may not be easy to get resolved natively from the Web calendar itself. 
+
+For the calendar users:  
+- Have a better visibility, an easy and quick way to query for the upcoming events
+- Get automatic reminders for the upcoming events that they organized
+
+For the calendar administrators:
+- Receive a notification when a new event is submitted, on a shared space with the whole administrators group
+- Have a easy and quick way to approve a submitted event
+
+
+## Proposed solution: WordPress-based Calendar with Cisco Webex-Teams Integration
 
 This is a Webex Teams integration for WordPress-based calendar, built using Node.js botkit and Python.  
 
