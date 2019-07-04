@@ -51,9 +51,13 @@ Note: To run the bot while specifying the variables of 1) as runtime variables:
 ACCESS_TOKEN=0123456789abcdef PUBLIC_URL=https://abcdef.ngrok.io node bot.js
 
 5) Run the Python monitor scripts, which include built-in schedulers, so no need for external cron schedulers:
+
 $ python check_for_upcoming_events.py
+
 $ python check_for_event_approvals.py
 
+Note:
+You can use the Ngrok auto-refresh script (https://github.com/charlesyoussef/botkit_with_auto-refreshed-ngrok) to automatically restart the bot using a new ngrok session. In that case, step 4) above will be replaced by the auto-refresh script.
 
 ## Authors & Maintainers
 
